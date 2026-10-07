@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CMMS Smart AI - Alejandro Faccini & Cia. S.A.S.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .signature-canvas { touch-action: none; background-color: #f8fafc; border: 2px dashed #cbd5e1; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- PANTALLA DE INICIO DE SESIÓN (LOGIN) -->
+    <div id="view-login" class="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950">
+        <div class="bg-white max-w-md w-full rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-6">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-gradient-to-tr from-teal-500 via-emerald-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-3xl text-white shadow-lg">
+                    <i class="fa-solid fa-snowflake"></i>
+                </div>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">ALEJANDRO FACCINI & CIA.</h1>
+                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">CMMS Climatización & Mantenimiento</p>
+            </div>
+
+            <form onsubmit="event.preventDefault(); procesarLogin();" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">ID de Usuario / Cédula</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                        <input type="text" id="login-userid" required placeholder="Ej: admin o tec1" class="w-full pl-9 pr-3 py-2.5 text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:bg-white outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-1.5">Contraseña / PIN</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-9 pr-3 py-2.5 text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:bg-white outline-none">
+                    </div>
+                </div>
+
+                <div id="login-error-msg" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold text-center"></div>
+
+                <button type="submit" id="btn-login-submit" class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Ingresar a la Plataforma</span>
+                </button>
+            </form>
+
+            <!-- Acceso Rápido de Prueba (Demo) -->
+            <div class="pt-4 border-t border-slate-100 text-center space-y-2">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Usuarios de Prueba Rápidos:</span>
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <button type="button" onclick="cargarDemoUser('admin', 'admin123')" class="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold rounded-lg hover:bg-amber-100">
+                        👑 Admin
+                    </button>
+                    <button type="button" onclick="cargarDemoUser('tec1', '1234')" class="px-2.5 py-1 bg-teal-50 border border-teal-200 text-teal-800 text-[11px] font-bold rounded-lg hover:bg-teal-100">
+                        👨‍🔧 Juan (tec1)
+                    </button>
+                    <button type="button" onclick="cargarDemoUser('tec2', '1234')" class="px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-800 text-[11px] font-bold rounded-lg hover:bg-blue-100">
+                        👨‍🔧 Carlos (tec2)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL (Visible tras iniciar sesión) -->
+    <div id="view-app" class="hidden flex-1 flex flex-col">
+        <!-- Barra Superior -->
+        <header class="sticky top-0 z-40 bg-slate-900 text-white border-b border-slate-800 shadow-xl">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-tr from-teal-500 to-indigo-600 p-2.5 rounded-2xl shadow-md">
+                        <i class="fa-solid fa-snowflake text-lg text-white"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-sm sm:text-base font-black text-white">CMMS Smart AI</h1>
+                            <span id="badge-user-role" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                ROL
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-400" id="header-user-welcome">Bienvenido: Usuario</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="cerrarSesion()" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-900/60 border border-slate-700 text-rose-300 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-power-off"></i>
+                        <span class="hidden sm:inline">Cerrar Sesión</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navegación Dinámica -->
+        <main class="max-w-7xl mx-auto px-4 pt-4 flex-1 w-full space-y-4">
+            <nav id="nav-tabs" class="flex bg-white p-1.5 rounded-2xl shadow-xs border border-slate-200 text-xs font-bold gap-1.5 overflow-x-auto custom-scrollbar">
+                <!-- Se poblará según si es Admin o Técnico -->
+            </nav>
+
+            <!-- VISTA ADMINISTRADOR -->
+            <section id="panel-admin" class="hidden space-y-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-base font-black text-slate-900">Panel Maestro de Operaciones & Facturación</h2>
+                        <p class="text-xs text-slate-500">Supervisión en tiempo real de todas las sedes, técnicos y cobros.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-black rounded-lg border border-emerald-200">
+                            Vista Global de Empresa
+                        </span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+                        <span class="text-xs font-bold text-slate-500 uppercase">Órdenes Totales</span>
+                        <div class="text-2xl font-black text-slate-900 mt-1" id="kpi-admin-total">4</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-amber-200 shadow-xs">
+                        <span class="text-xs font-bold text-amber-600 uppercase">En Ejecución</span>
+                        <div class="text-2xl font-black text-amber-600 mt-1" id="kpi-admin-progress">2</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-blue-200 shadow-xs">
+                        <span class="text-xs font-bold text-blue-600 uppercase">Por Facturar</span>
+                        <div class="text-2xl font-black text-blue-600 mt-1" id="kpi-admin-billing">1</div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-emerald-200 shadow-xs">
+                        <span class="text-xs font-bold text-emerald-600 uppercase">Cerradas</span>
+                        <div class="text-2xl font-black text-emerald-600 mt-1" id="kpi-admin-closed">1</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA TÉCNICO DE CAMPO -->
+            <section id="panel-tecnico" class="hidden space-y-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base font-black text-slate-900" id="tech-workspace-title">Mis Rutinas de Mantenimiento</h2>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-teal-50 text-teal-700 border border-teal-200">En Curso</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">Selecciona el cliente asignado para abrir y ejecutar sus equipos.</p>
+                    </div>
+                </div>
+
+                <div id="tech-clients-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Tarjeta de Cliente de Prueba -->
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4 hover:border-teal-500 transition-colors">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-lg font-black">
+                                    <i class="fa-solid fa-building"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-black text-slate-900">BUSINESS 116</h3>
+                                    <p class="text-xs text-slate-400">Calle 116 # 9-78 • Bogotá</p>
+                                </div>
+                            </div>
+                            <span class="px-2 py-1 bg-amber-50 text-amber-800 text-[10px] font-black rounded-lg border border-amber-200">
+                                4 Equipos
+                            </span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-bold text-slate-600">
+                                <span>Avance</span>
+                                <span class="text-teal-700 font-black">50%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                                <div class="bg-teal-600 h-full" style="width: 50%"></div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="alert('Abriendo equipos del cliente...')" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-black text-xs rounded-xl transition-all shadow-xs flex items-center justify-center gap-2">
+                            <span>Abrir Lista de Equipos</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // BASE DE DATOS LOCAL DE USUARIOS (Sincronizable con Google Sheets)
+        const usuariosSistema = [
+            { id: "admin", pass: "admin123", nombre: "Ing. Director Mantenimiento", rol: "ADMIN", email: "director@empresa.com" },
+            { id: "tec1", pass: "1234", nombre: "Juan Pérez", rol: "TECH", email: "tecnico1@empresa.com" },
+            { id: "tec2", pass: "1234", nombre: "Carlos Gómez", rol: "TECH", email: "tecnico2@empresa.com" },
+            { id: "tec3", pass: "1234", nombre: "Andrés Rojas", rol: "TECH", email: "tecnico3@empresa.com" }
+        ];
+
+        let usuarioActivo = null;
+
+        function cargarDemoUser(user, pass) {
+            document.getElementById('login-userid').value = user;
+            document.getElementById('login-password').value = pass;
+            procesarLogin();
+        }
+
+        function procesarLogin() {
+            const uid = document.getElementById('login-userid').value.trim().toLowerCase();
+            const pass = document.getElementById('login-password').value.trim();
+            const errorMsg = document.getElementById('login-error-msg');
+
+            const encontrado = usuariosSistema.find(u => u.id.toLowerCase() === uid && u.pass === pass);
+
+            if (encontrado) {
+                usuarioActivo = encontrado;
+                localStorage.setItem('cmms_sesion_activa', JSON.stringify(encontrado));
+                errorMsg.classList.add('hidden');
+                iniciarAplicacion();
+            } else {
+                errorMsg.innerText = "ID de usuario o contraseña incorrectos.";
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function iniciarAplicacion() {
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-app').classList.remove('hidden');
+
+            document.getElementById('header-user-welcome').innerText = `${usuarioActivo.nombre}`;
+            const badgeRol = document.getElementById('badge-user-role');
+            badgeRol.innerText = usuarioActivo.rol === 'ADMIN' ? 'ADMINISTRADOR' : 'TÉCNICO DE CAMPO';
+
+            const panelAdmin = document.getElementById('panel-admin');
+            const panelTech = document.getElementById('panel-tecnico');
+            const navTabs = document.getElementById('nav-tabs');
+
+            if (usuarioActivo.rol === 'ADMIN') {
+                panelAdmin.classList.remove('hidden');
+                panelTech.classList.add('hidden');
+                navTabs.innerHTML = `
+                    <button class="py-2 px-4 rounded-xl bg-teal-600 text-white flex items-center gap-1.5"><i class="fa-solid fa-chart-pie"></i> Panel General</button>
+                    <button class="py-2 px-4 rounded-xl text-slate-600 hover:bg-slate-50 flex items-center gap-1.5"><i class="fa-solid fa-boxes-stacked"></i> Equipos</button>
+                    <button class="py-2 px-4 rounded-xl text-slate-600 hover:bg-slate-50 flex items-center gap-1.5"><i class="fa-solid fa-file-invoice-dollar"></i> Facturación</button>
+                `;
+            } else {
+                panelAdmin.classList.add('hidden');
+                panelTech.classList.remove('hidden');
+                document.getElementById('tech-workspace-title').innerText = `Mis Rutinas (${usuarioActivo.nombre})`;
+                navTabs.innerHTML = `
+                    <button class="py-2 px-4 rounded-xl bg-teal-600 text-white flex items-center gap-1.5"><i class="fa-solid fa-list-check"></i> Mis Rutinas</button>
+                    <button class="py-2 px-4 rounded-xl text-slate-600 hover:bg-slate-50 flex items-center gap-1.5"><i class="fa-solid fa-file-pen"></i> Formulario de Campo</button>
+                `;
+            }
+        }
+
+        function cerrarSesion() {
+            usuarioActivo = null;
+            localStorage.removeItem('cmms_sesion_activa');
+            document.getElementById('view-app').classList.add('hidden');
+            document.getElementById('view-login').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
+        }
+
+        window.onload = function() {
+            const guardado = localStorage.getItem('cmms_sesion_activa');
+            if (guardado) {
+                try {
+                    usuarioActivo = JSON.parse(guardado);
+                    iniciarAplicacion();
+                } catch(e) {
+                    cerrarSesion();
+                }
+            }
+        };
+    </script>
+</body>
+</html>
